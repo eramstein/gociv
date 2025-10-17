@@ -19,8 +19,8 @@ type Tile struct {
 }
 
 type Region struct {
-	Id      int
-	Name    string
-	TileIds []int
-	Biome   TerrainType
+	Id       int
+	Name     string
+	TileIds  []int
+	Centroid [2]int
 }

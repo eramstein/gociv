@@ -21,6 +21,7 @@ func GetVoronoiSeeds(width, height, numRegions int) []VoronoiSeed {
 		}
 	}
 
+	// 1st pass: fully random seeds
 	seeds := make([]VoronoiSeed, 0, numRegions)
 	used := make(map[int]struct{})
 	for len(seeds) < numRegions {
@@ -34,6 +35,7 @@ func GetVoronoiSeeds(width, height, numRegions int) []VoronoiSeed {
 		seeds = append(seeds, VoronoiSeed{C: c, R: r})
 	}
 
+	// 2nd pass: make seeds more evenly distributed to have regions of similar size
 	// Lloyd relaxation: alternate assignment and centroid update
 	const iterations = 2
 	for it := 0; it < iterations; it++ {
@@ -41,7 +43,7 @@ func GetVoronoiSeeds(width, height, numRegions int) []VoronoiSeed {
 		for idx := range tiles {
 			t := &tiles[idx]
 			bestRegion := 0
-			bestDist := int(^uint(0) >> 1)
+			bestDist := int(^uint(0) >> 1) // largest possible distance
 			for i, s := range seeds {
 				d := GetHexDistance(t.Col, t.Row, s.C, s.R)
 				if d < bestDist {

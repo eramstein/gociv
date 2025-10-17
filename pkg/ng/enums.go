@@ -12,4 +12,5 @@ const (
 	Ice
 	Savannah
 	Swamp
+	Wasteland
 )

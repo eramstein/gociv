@@ -36,6 +36,7 @@ func NewRenderer() *Renderer {
 	r.TerrainTex[ng.Ice] = rl.LoadTexture("assets/images/tiles/ice.png")
 	r.TerrainTex[ng.Savannah] = rl.LoadTexture("assets/images/tiles/savannah.png")
 	r.TerrainTex[ng.Swamp] = rl.LoadTexture("assets/images/tiles/swamp.png")
+	r.TerrainTex[ng.Wasteland] = rl.LoadTexture("assets/images/tiles/wasteland.png")
 	log.Printf("Loaded terrain textures in %v", time.Since(start))
 
 	return r

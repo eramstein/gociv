@@ -74,7 +74,7 @@ func DrawMap(mapData *ng.WorldMap, camera rl.Camera2D, renderer *Renderer) {
 
 			rl.DrawTexturePro(tex, src, dst, origin, 0, rl.White)
 			// rl.DrawText(fmt.Sprintf("%d,%d", col, r32), int32(center.X)-int32(TileSize/2), int32(center.Y)-3, 6, rl.RayWhite)
-			// rl.DrawText(fmt.Sprintf("%d", tile.RegionId), int32(center.X), int32(center.Y), 16, rl.RayWhite)
+			// rl.DrawText(fmt.Sprintf("%d,%d", mapData.Regions[tile.RegionId].Centroid[0], mapData.Regions[tile.RegionId].Centroid[1]), int32(center.X), int32(center.Y), 16, rl.RayWhite)
 		}
 	}
 }

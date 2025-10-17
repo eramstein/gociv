@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(1600, 900, "Gociv")
 	defer rl.CloseWindow()
 
