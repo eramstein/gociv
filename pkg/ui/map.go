@@ -66,13 +66,13 @@ func DrawMap(mapData *ng.WorldMap, camera rl.Camera2D, renderer *Renderer) {
 			origin := rl.NewVector2(hexWidth/2, hexHeight/2)
 
 			//compute a stable tint per region using HSV; semi-transparent so base texture shows
-			// hueIndex := tile.RegionId % 50
-			// hue := float32((hueIndex*37)%50) * 360.0 / 50.0
-			// tint := rl.ColorFromHSV(hue, 0.35, 1.0)
-			// tint.A = 200
-			// rl.DrawTexturePro(tex, src, dst, origin, 0, tint)
+			hueIndex := tile.RegionId % 50
+			hue := float32((hueIndex*37)%50) * 360.0 / 50.0
+			tint := rl.ColorFromHSV(hue, 0.35, 1.0)
+			tint.A = 200
+			rl.DrawTexturePro(tex, src, dst, origin, 0, tint)
 
-			rl.DrawTexturePro(tex, src, dst, origin, 0, rl.White)
+			// rl.DrawTexturePro(tex, src, dst, origin, 0, rl.White)
 			// rl.DrawText(fmt.Sprintf("%d,%d", col, r32), int32(center.X)-int32(TileSize/2), int32(center.Y)-3, 6, rl.RayWhite)
 			// rl.DrawText(fmt.Sprintf("%d,%d", mapData.Regions[tile.RegionId].Centroid[0], mapData.Regions[tile.RegionId].Centroid[1]), int32(center.X), int32(center.Y), 16, rl.RayWhite)
 		}
