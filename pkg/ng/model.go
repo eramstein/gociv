@@ -16,6 +16,7 @@ type Tile struct {
 	Col      int
 	Row      int
 	Terrain  TerrainType
+	Feature  FeatureType
 }
 
 type Region struct {

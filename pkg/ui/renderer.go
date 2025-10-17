@@ -13,6 +13,7 @@ import (
 type Renderer struct {
 	Camera     rl.Camera2D
 	TerrainTex map[ng.TerrainType]rl.Texture2D
+	FeatureTex map[ng.FeatureType]rl.Texture2D
 }
 
 func NewRenderer() *Renderer {
@@ -24,6 +25,7 @@ func NewRenderer() *Renderer {
 			Zoom:     1,
 		},
 		TerrainTex: make(map[ng.TerrainType]rl.Texture2D),
+		FeatureTex: make(map[ng.FeatureType]rl.Texture2D),
 	}
 
 	start := time.Now()
@@ -37,6 +39,10 @@ func NewRenderer() *Renderer {
 	r.TerrainTex[ng.Savannah] = rl.LoadTexture("assets/images/tiles/savannah.png")
 	r.TerrainTex[ng.Swamp] = rl.LoadTexture("assets/images/tiles/swamp.png")
 	r.TerrainTex[ng.Wasteland] = rl.LoadTexture("assets/images/tiles/wasteland.png")
+
+	// Load feature textures (PNGs). Files should exist at these paths.
+	r.FeatureTex[ng.City] = rl.LoadTexture("assets/images/features/city.png")
+
 	log.Printf("Loaded terrain textures in %v", time.Since(start))
 
 	return r

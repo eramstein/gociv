@@ -14,3 +14,10 @@ const (
 	Swamp
 	Wasteland
 )
+
+type FeatureType int
+
+const (
+	NoFeature FeatureType = iota
+	City
+)

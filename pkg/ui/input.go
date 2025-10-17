@@ -37,10 +37,10 @@ func UpdateInput(gameData *ng.GameData, renderer *Renderer) {
 		// bounds check
 		if col >= 0 && row >= 0 && int(col) < gameData.WorldMap.Width && int(row) < gameData.WorldMap.Height {
 			tile := gameData.WorldMap.GetTileAt(int(col), int(row))
-			tile.UpdateTerrain(ng.Forest)
-			adjacentTiles := gameData.WorldMap.GetAdjacentTiles(int(col), int(row))
-			for _, adjacentTile := range adjacentTiles {
-				adjacentTile.UpdateTerrain(ng.Mountains)
+			if tile.RegionId == State.SelectedRegionID {
+				State.SelectedRegionID = -1
+			} else {
+				State.SelectedRegionID = tile.RegionId
 			}
 		}
 	}

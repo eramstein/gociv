@@ -3,6 +3,7 @@ package ng
 import (
 	"fmt"
 	"gociv/pkg/utils"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -20,7 +21,10 @@ func NewWorldMap() *WorldMap {
 	initWorldMap(&mapData)
 	initRegions(&mapData)
 	assignTilesToRegions(&mapData, RegionCount)
-	assignTerrainToTiles(&mapData)
+	setRegionCentroids(&mapData)
+	regionBiomes := makeRegionBiomes(&mapData)
+	assignTerrainToTiles(&mapData, regionBiomes)
+	assignFeaturesToRegions(&mapData, regionBiomes)
 
 	return &mapData
 }
@@ -68,9 +72,26 @@ func assignTilesToRegions(world *WorldMap, numRegions int) {
 			}
 		}
 		t.RegionId = bestRegion
-		region := &world.Regions[bestRegion]
 		world.Regions[bestRegion].TileIds = append(world.Regions[bestRegion].TileIds, idx)
-		region.Centroid = [2]int{t.Col, t.Row}
+	}
+}
+
+func setRegionCentroids(world *WorldMap) {
+	for i := 0; i < RegionCount; i++ {
+		region := &world.Regions[i]
+		if len(region.TileIds) == 0 {
+			continue
+		}
+		avgX := 0.0
+		avgY := 0.0
+		for _, tileId := range region.TileIds {
+			t := &world.Tiles[tileId]
+			avgX += float64(t.Col)
+			avgY += float64(t.Row)
+		}
+		avgX /= float64(len(region.TileIds))
+		avgY /= float64(len(region.TileIds))
+		region.Centroid = [2]int{int(math.Round(avgX)), int(math.Round(avgY))}
 	}
 }
 
@@ -88,7 +109,7 @@ func makeRegionBiomes(world *WorldMap) []RegionBuildData {
 		region := world.Regions[i]
 
 		// type
-		isOcean := region.Centroid[1] < OceanBoundary || region.Centroid[0] < OceanBoundary || region.Centroid[0] > MapWidth-OceanBoundary || region.Centroid[1] > MapHeight-OceanBoundary+2
+		isOcean := region.Centroid[1] < OceanBoundary || region.Centroid[0] < OceanBoundary || region.Centroid[0] > MapWidth-OceanBoundary || region.Centroid[1] > MapHeight-OceanBoundary
 		regionType := NoRegionType
 		isChaos := chaosRegions[i]
 		isSylvan := sylvanRegions[i]
@@ -122,8 +143,7 @@ func makeRegionBiomes(world *WorldMap) []RegionBuildData {
 	return regions
 }
 
-func assignTerrainToTiles(world *WorldMap) {
-	regionBiomes := makeRegionBiomes(world)
+func assignTerrainToTiles(world *WorldMap, regionBiomes []RegionBuildData) {
 	for idx := range world.Tiles {
 		t := &world.Tiles[idx]
 		biome := regionBiomes[t.RegionId]
@@ -156,4 +176,28 @@ func getTileTerrainFromBiome(biome RegionBuildData) TerrainType {
 	}
 	//fmt.Println(prevalences)
 	return utils.GetWeightedRandomFromMap(prevalences)
+}
+
+func assignFeaturesToRegions(world *WorldMap, regionBiomes []RegionBuildData) {
+	for i := 0; i < RegionCount; i++ {
+		region := &world.Regions[i]
+
+		if regionBiomes[i].Type == Ocean || regionBiomes[i].Type == Chaos || regionBiomes[i].Type == Sylvan {
+			continue
+		}
+
+		// city towards center of region
+		centroidTile := world.GetTileAt(region.Centroid[0], region.Centroid[1])
+		if centroidTile.Terrain != Water {
+			centroidTile.Feature = City
+		} else {
+			for _, tileId := range region.TileIds {
+				tile := &world.Tiles[tileId]
+				if tile.Terrain != Water {
+					tile.Feature = City
+					break
+				}
+			}
+		}
+	}
 }
