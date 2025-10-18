@@ -68,19 +68,25 @@ var BaseTerrainPrevalence = map[TerrainType]int{
 }
 
 var RegionElevationToTerrain = map[RegionElevation]map[TerrainType]int{
-	LowElevation:    {Mountains: -30},
-	MediumElevation: {Mountains: 30},
-	HighElevation:   {Mountains: 150, Swamp: -10},
+	LowElevation:    {Mountains: 5},
+	MediumElevation: {Mountains: 20},
+	HighElevation:   {Mountains: 50},
 }
 
-var RegionHumidityToTerrain = map[RegionHumidity]map[TerrainType]int{
-	LowHumidity:    {Grassland: -20, Swamp: -20, Savannah: 30, Plains: 40},
-	MediumHumidity: {Forest: 40},
-	HighHumidity:   {Grassland: 40, Swamp: 40, Water: 20},
-}
-
-var RegionTemperatureToTerrain = map[RegionTemperature]map[TerrainType]int{
-	LowTemperature:    {Ice: 150, Grassland: -20, Savannah: -50},
-	MediumTemperature: {},
-	HighTemperature:   {Ice: -80, Savannah: 50, Plains: 20, Swamp: 20},
+var BiomeToTerrain = map[RegionHumidity]map[RegionTemperature]map[TerrainType]int{
+	LowHumidity: {
+		LowTemperature:    {Ice: 80, Plains: 60},
+		MediumTemperature: {Forest: 50, Plains: 60},
+		HighTemperature:   {Savannah: 100, Plains: 60},
+	},
+	MediumHumidity: {
+		LowTemperature:    {Ice: 40, Forest: 80},
+		MediumTemperature: {Forest: 100},
+		HighTemperature:   {Forest: 80},
+	},
+	HighHumidity: {
+		LowTemperature:    {Ice: 40, Swamp: 20, Grassland: 60},
+		MediumTemperature: {Swamp: 20, Forest: 60, Grassland: 60},
+		HighTemperature:   {Swamp: 20, Grassland: 60},
+	},
 }

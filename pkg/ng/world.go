@@ -25,7 +25,7 @@ func NewWorldMap() *WorldMap {
 	regionBiomes := makeRegionBiomes(&mapData)
 	assignTerrainToTiles(&mapData, regionBiomes)
 	assignFeaturesToRegions(&mapData, regionBiomes)
-
+	computeRegionBorders(&mapData)
 	return &mapData
 }
 
@@ -135,7 +135,7 @@ func makeRegionBiomes(world *WorldMap) []RegionBuildData {
 
 		regions = append(regions, RegionBuildData{
 			Type:        regionType,
-			Elevation:   utils.GetRandomFromArray([]RegionElevation{LowElevation, MediumElevation, HighElevation}),
+			Elevation:   utils.GetRandomFromArray([]RegionElevation{LowElevation, LowElevation, LowElevation, MediumElevation, MediumElevation, HighElevation}),
 			Humidity:    utils.GetRandomFromArray([]RegionHumidity{LowHumidity, MediumHumidity, HighHumidity}),
 			Temperature: temperature,
 		})
@@ -161,15 +161,20 @@ func assignTerrainToTiles(world *WorldMap, regionBiomes []RegionBuildData) {
 }
 
 func getTileTerrainFromBiome(biome RegionBuildData) TerrainType {
+	// first check for mountains
+	elevationAdjustments := RegionElevationToTerrain[biome.Elevation]
+	if rand.Intn(100) < elevationAdjustments[Mountains] {
+		return Mountains
+	}
+	// else get random other based on temperature and humidity
 	prevalences := make(map[TerrainType]int, len(BaseTerrainPrevalence))
 	for k, v := range BaseTerrainPrevalence {
 		prevalences[k] = v
 	}
-	elevationAdjustments := RegionElevationToTerrain[biome.Elevation]
-	humidityAdjustments := RegionHumidityToTerrain[biome.Humidity]
-	temperatureAdjustments := RegionTemperatureToTerrain[biome.Temperature]
+
+	biomeAdjustments := BiomeToTerrain[biome.Humidity][biome.Temperature]
 	for terrain := range prevalences {
-		prevalences[terrain] += elevationAdjustments[terrain] + humidityAdjustments[terrain] + temperatureAdjustments[terrain]
+		prevalences[terrain] += biomeAdjustments[terrain]
 		if prevalences[terrain] < 0 {
 			prevalences[terrain] = 0
 		}
@@ -200,4 +205,38 @@ func assignFeaturesToRegions(world *WorldMap, regionBiomes []RegionBuildData) {
 			}
 		}
 	}
+}
+
+func computeRegionBorders(world *WorldMap) {
+	for idx := range world.Tiles {
+		tile := &world.Tiles[idx]
+		borderDirections := int8(0)
+		for direction := 0; direction < 6; direction++ {
+			if !isFromSameRegion(world, tile, direction) {
+				borderDirections |= 1 << direction
+			}
+		}
+		tile.Border = borderDirections
+	}
+}
+
+// 0-5 represent directions 0-5 (E, NE, NW, W, SW, SE)
+func isFromSameRegion(world *WorldMap, tile *Tile, direction int) bool {
+	var deltas [6][2]int
+	if tile.Row%2 == 0 { // even rows
+		deltas = EvenRowDeltas
+	} else { // odd rows
+		deltas = OddRowDeltas
+	}
+	if tile.Col+deltas[direction][0] < 0 ||
+		tile.Col+deltas[direction][0] >= world.Width ||
+		tile.Row+deltas[direction][1] < 0 ||
+		tile.Row+deltas[direction][1] >= world.Height {
+		return false
+	}
+	otherTile := world.GetTileAt(tile.Col+deltas[direction][0], tile.Row+deltas[direction][1])
+	if otherTile == nil {
+		return false
+	}
+	return tile.RegionId == otherTile.RegionId
 }

@@ -1,20 +1,21 @@
 package ng
 
+// odd-r neighbor deltas ([col,row] offsets)
+var EvenRowDeltas = [6][2]int{{+1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {-1, +1}, {0, +1}}
+var OddRowDeltas = [6][2]int{{+1, 0}, {+1, -1}, {0, -1}, {-1, 0}, {0, +1}, {+1, +1}}
+
 func (worldMap *WorldMap) GetTileAt(col, row int) *Tile {
 	return &worldMap.Tiles[row*worldMap.Width+col]
 }
 
 // GetAdjacentTiles returns neighboring tiles around (col,row) using odd-r offset coordinates.
 func (worldMap *WorldMap) GetAdjacentTiles(col, row int) []*Tile {
-	// odd-r neighbor deltas
-	evenRow := [6][2]int{{+1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {-1, +1}, {0, +1}}
-	oddRow := [6][2]int{{+1, 0}, {+1, -1}, {0, -1}, {-1, 0}, {0, +1}, {+1, +1}}
 
 	var deltas [6][2]int
 	if row%2 == 0 { // even rows
-		deltas = evenRow
+		deltas = EvenRowDeltas
 	} else { // odd rows
-		deltas = oddRow
+		deltas = OddRowDeltas
 	}
 
 	neighbors := make([]*Tile, 0, 6)

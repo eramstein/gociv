@@ -12,7 +12,7 @@ func main() {
 	rl.InitWindow(1600, 900, "Gociv")
 	defer rl.CloseWindow()
 
-	rl.SetTargetFPS(60)
+	//rl.SetTargetFPS(60)
 
 	gameData := ng.NewGame()
 	renderer := ui.NewRenderer()
@@ -27,7 +27,7 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 		renderer.Render(&gameData.WorldMap)
-		// rl.DrawFPS(700, 10)
+		rl.DrawFPS(700, 10)
 		rl.EndDrawing()
 	}
 }

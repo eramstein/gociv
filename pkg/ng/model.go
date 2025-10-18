@@ -17,6 +17,7 @@ type Tile struct {
 	Row      int
 	Terrain  TerrainType
 	Feature  FeatureType
+	Border   int8 // bit 0-5 represent directions 0-5 (E, NE, NW, W, SW, SE)
 }
 
 type Region struct {
