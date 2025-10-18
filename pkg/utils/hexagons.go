@@ -1,6 +1,32 @@
 package utils
 
-import "math"
+import (
+	"math"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+// Pre-computed hexagon vertex offsets (relative to center)
+// These are the unit vectors for a regular hexagon, scaled by radius
+var HexVertexOffsets = [6]rl.Vector2{
+	{X: 0.8660254, Y: 0.5},   // Vertex 0
+	{X: 0.8660254, Y: -0.5},  // Vertex 1
+	{X: 0.0, Y: -1.0},        // Vertex 2
+	{X: -0.8660254, Y: -0.5}, // Vertex 3
+	{X: -0.8660254, Y: 0.5},  // Vertex 4
+	{X: 0.0, Y: 1.0},         // Vertex 5
+}
+
+// Map border directions to hexagon edges
+// Each direction corresponds to the edge between two vertices
+var EdgeMapping = [6][2]int{
+	{0, 1}, // Direction 0 (East) -> edge between vertex 0 and 1
+	{1, 2}, // Direction 1 (NE) -> edge between vertex 1 and 2
+	{2, 3}, // Direction 2 (NW) -> edge between vertex 2 and 3
+	{3, 4}, // Direction 3 (West) -> edge between vertex 3 and 4
+	{4, 5}, // Direction 4 (SW) -> edge between vertex 4 and 5
+	{5, 0}, // Direction 5 (SE) -> edge between vertex 5 and 0
+}
 
 // oddRToCube converts odd-r offset (col,row) to cube coordinates (x,y,z) for pointy-top hexes.
 func OddRToCube(col, row int) (int, int, int) {

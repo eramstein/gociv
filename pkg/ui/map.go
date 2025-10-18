@@ -2,6 +2,7 @@ package ui
 
 import (
 	"gociv/pkg/ng"
+	"gociv/pkg/utils"
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -93,7 +94,7 @@ func drawTile(tile *ng.Tile, renderer *Renderer, center rl.Vector2, hexWidth flo
 
 	// Draw region borders if any exist
 	if State.SelectedRegionID == tile.RegionId && tile.Border != 0 {
-		drawRegionBorders(tile, center, hexWidth, hexHeight)
+		drawRegionBorders(tile, center, hexHeight)
 	}
 }
 
@@ -134,39 +135,26 @@ func PixelToHexagon(x, y float32) (int32, int32) {
 }
 
 // drawRegionBorders draws thick borders on hexagon edges that are region boundaries
-func drawRegionBorders(tile *ng.Tile, center rl.Vector2, hexWidth float32, hexHeight float32) {
-
+func drawRegionBorders(tile *ng.Tile, center rl.Vector2, hexHeight float32) {
 	borderColor := rl.Black
 	borderThickness := float32(5)
 
 	vertices := make([]rl.Vector2, 6)
 	radius := hexHeight / 2 // pointy hexagon points are on a circle of radius size/2
 
-	// compute coordinates of the hexagon points
+	// compute coordinates of the hexagon points using pre-computed offsets
 	for i := 0; i < 6; i++ {
-		angle := (float64(i) - 0.5) * math.Pi / 3.0 // 60 degrees in radians
 		vertices[i] = rl.Vector2{
-			X: center.X + radius*float32(math.Cos(angle)),
-			Y: center.Y - radius*float32(math.Sin(angle)),
+			X: center.X + radius*utils.HexVertexOffsets[i].X,
+			Y: center.Y + radius*utils.HexVertexOffsets[i].Y,
 		}
-	}
-
-	// Map border directions to hexagon edges
-	// Each direction corresponds to the edge between two vertices
-	edgeMapping := [6][2]int{
-		{0, 1}, // Direction 0 (East) -> edge between vertex 0 and 1
-		{1, 2}, // Direction 1 (NE) -> edge between vertex 1 and 2
-		{2, 3}, // Direction 2 (NW) -> edge between vertex 2 and 3
-		{3, 4}, // Direction 3 (West) -> edge between vertex 3 and 4
-		{4, 5}, // Direction 4 (SW) -> edge between vertex 4 and 5
-		{5, 0}, // Direction 5 (SE) -> edge between vertex 5 and 0
 	}
 
 	// Draw border lines for each direction that has a border
 	for direction := 0; direction < 6; direction++ {
 		if tile.Border&(1<<direction) != 0 {
-			startIdx := edgeMapping[direction][0]
-			endIdx := edgeMapping[direction][1]
+			startIdx := utils.EdgeMapping[direction][0]
+			endIdx := utils.EdgeMapping[direction][1]
 			start := vertices[startIdx]
 			end := vertices[endIdx]
 			rl.DrawLineEx(start, end, borderThickness, borderColor)
